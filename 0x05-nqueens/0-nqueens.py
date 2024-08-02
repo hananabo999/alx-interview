@@ -1,44 +1,48 @@
 #!/usr/bin/python3
-""" N queens """
-import sys
+"""Module for N queens problem."""
 
 
-if len(sys.argv) > 2 or len(sys.argv) < 2:
-    print("Usage: nqueens N")
-    exit(1)
+def queen(N):
+    output = []
+    pos = []
 
-if not sys.argv[1].isdigit():
-    print("N must be a number")
-    exit(1)
+    def helper_function(x: int):
+        if x == N:
+            output.append(pos[:])
+            return
 
-if int(sys.argv[1]) < 4:
-    print("N must be at least 4")
-    exit(1)
+        for y in range(N):
+            if is_valid(pos, x, y):
+                pos.append([x, y])
+                helper_function(x + 1)
+                pos.pop()  # Backtrack
 
-n = int(sys.argv[1])
+    def is_valid(board, x, y):
+        for row in board:
+            if (x == row[0] or y == row[1] or x + y == row[0] + row[1] or
+                    x - y == row[0] - row[1]):
+                return False
+        return True
 
-
-def queens(n, i=0, a=[], b=[], c=[]):
-    """ find possible positions """
-    if i < n:
-        for j in range(n):
-            if j not in a and i + j not in b and i - j not in c:
-                yield from queens(n, i + 1, a + [j], b + [i + j], c + [i - j])
-    else:
-        yield a
-
-
-def solve(n):
-    """ solve """
-    k = []
-    i = 0
-    for solution in queens(n, 0):
-        for s in solution:
-            k.append([i, s])
-            i += 1
-        print(k)
-        k = []
-        i = 0
+    helper_function(0)
+    return output
 
 
-solve(n)
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) != 2:
+        print("Usage: nqueens N")
+        sys.exit(1)
+
+    try:
+        N = int(sys.argv[1])
+        if N < 4:
+            print("N must be at least 4")
+            sys.exit(1)
+    except ValueError:
+        print("N must be a number")
+        sys.exit(1)
+
+    solutions = queen(N)
+    for solution in solutions:
+        print(solution)
